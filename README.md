@@ -38,7 +38,6 @@ cd bookmark-manager
 ### 2. Install Dependencies
 ```sh
 npm install  # For backend
-yarn install  # For frontend (inside the client folder)
 ```
 
 ### 3. Setup Environment Variables
