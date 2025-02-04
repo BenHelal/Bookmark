@@ -29,3 +29,20 @@ exports.getBookmarks = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// GET /bookmarks/:id - Get a specific bookmark
+exports.getBookmarkById = async (req, res) => {
+  try {
+    const bookmark = await Bookmark.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+    if (!bookmark) {
+      return res.status(404).json({ message: "Bookmark not found" });
+    }
+    res.json(bookmark);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
