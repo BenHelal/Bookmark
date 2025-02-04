@@ -133,3 +133,95 @@ exports.searchBookmarks = async (req, res) => {
 };
 
 
+// POST /bookmarks/import 
+// Import bookmarks from a browser export
+exports.importBookmarks = async (req, res) => {
+  // Assume bookmarks is an array of bookmark objects
+  const {bookmarks} = res.body;
+
+  try {
+    const importBookmarks = await Bookmark.insertMany(
+      bookmarks.map((bookmark) => ({
+        ...bookmark,
+        user: req.user.id,
+      }))
+    );
+
+    res.json(importedBookmars);
+
+  } catch (err) {
+    res.status(500).json({message: "Server error"});
+  }
+};
+
+// GET /bookmarks/export
+// Export bookmarks as JSON or CSV
+exports.exportBookmarks = async (req, res) => {
+  // 'json' or 'csv'
+  const { format } = req.query;
+  try {
+    const bookmark = await Bookmark.find({
+      user: req.user.id
+    });
+    
+    if (format === "csv") {
+      //convert bookmarks to CSV format
+      const csv = bookmarks.map((bookmark)=>
+        ` ${bookmark.title},
+          ${bookmark.url},
+          ${bookmark.description},
+          ${bookmark.tags.join(";")},
+          ${bookmark.category},
+          ${bookmark.priority}`
+      ).join("\n"); res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", "attachment; filename=bookmarks.csv");
+      
+      return res.send(csv);
+    }else if(format === "json"){
+      // Default to JSON
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Content-Disposition", "attachment; filename=bookmarks.json");
+      return res.send(JSON.stringify(bookmarks, null, 2));
+    }else{
+      return res.status(404).json({
+        message: "Format not available"
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+
+// POST /bookmarks/share/:id - Generate a public shareable link
+exports.shareBookmark = async (req, res) => {
+  try {
+    const bookmark = await Bookmark.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+    if (!bookmark) {
+      return res.status(404).json({ message: "Bookmark not found" });
+    }
+
+    // Generate a unique shareable link (e.g., using a UUID or hash)
+    const shareableLink = `https://yourdomain.com/bookmarks/shared/${bookmark._id}`;
+    res.json({ shareableLink });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// GET /bookmarks/shared/:id - Access a shared bookmark
+exports.getSharedBookmark = async (req, res) => {
+  try {
+    const bookmark = await Bookmark.findById(req.params.id);
+    if (!bookmark) {
+      return res.status(404).json({ message: "Bookmark not found" });
+    }
+    res.json(bookmark);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
