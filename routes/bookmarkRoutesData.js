@@ -1,10 +1,5 @@
 const express = require("express");
 const {
-  addBookmark,
-  getBookmarks,
-  getBookmarkById,
-  updateBookmark,
-  deleteBookmark,
   searchBookmarks,
   importBookmarks,
   exportBookmarks,
@@ -13,7 +8,6 @@ const {
 } = require("../controllers/bookmarkController");
 const authMiddleware = require("../middleware/authMiddleware");
 const {
-  validateBookmark,
   validateSearchQuery,
   validateImportBookmarks,
   validateExportFormat,
@@ -23,20 +17,6 @@ const {
 
 const router = express.Router();
 
-// Create a new bookmark
-router.post("/", authMiddleware, validateBookmark, handleValidationErrors, addBookmark);
-
-// Get all bookmarks for the authenticated user
-router.get("/", authMiddleware, getBookmarks);
-
-// Get a specific bookmark by ID
-router.get("/:id", authMiddleware, validateSharedBookmarkId, handleValidationErrors, getBookmarkById);
-
-// Update a bookmark by ID
-router.put("/:id", authMiddleware, validateBookmark, handleValidationErrors, updateBookmark);
-
-// Delete a bookmark by ID
-router.delete("/:id", authMiddleware, validateSharedBookmarkId, handleValidationErrors, deleteBookmark);
 
 // Search bookmarks by query (title, tags, category)
 router.get("/search", authMiddleware, validateSearchQuery, handleValidationErrors, searchBookmarks);

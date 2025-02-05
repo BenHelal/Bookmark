@@ -6,4 +6,7 @@ const UserSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+// Use the correct variable name (UserSchema instead of userSchema)
+UserSchema.index({ email: 1 }, { unique: true });
+
 module.exports = mongoose.model("User", UserSchema);

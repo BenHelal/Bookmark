@@ -112,23 +112,29 @@ exports.deleteBookmark = async (req, res) =>{
 }
 
 
-// GET /bookmarks/search?query=xyz 
-// Search bookmarks by title, tags, category
+// GET /bookmarks/search?query=xyz
+// Search bookmarks by title, tags, or category
 exports.searchBookmarks = async (req, res) => {
-  const{ query } = req.query;
+  const { query } = req.query;
+
   try {
     const bookmarks = await Bookmark.find({
       user: req.user.id,
       $or: [
-        { title: { $regex: query, $options: "i"}},
-        { tags: { $regex: query, $options: "i"}},
-        { category: { $regex: query, $options: "i"}},
+        { title: { $regex: query, $options: "i" } },
+        { tags: { $regex: query, $options: "i" } },
+        { category: { $regex: query, $options: "i" } },
       ],
     });
 
+    if (bookmarks.length === 0) {
+      return res.status(404).json({ message: "No bookmarks found matching your search." });
+    }
+
     res.json(bookmarks);
   } catch (err) {
-      res.status(500).json({message: "Server error"});
+    console.error("Search error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
