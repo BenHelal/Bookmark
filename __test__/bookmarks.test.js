@@ -133,8 +133,6 @@ describe("Bookmark Routes", () => {
   });
 
   afterAll(async () => {
-    await Bookmark.deleteMany({});
-    await User.deleteMany({});
     await mongoose.connection.close(); // Close the database connection
   });
 });
